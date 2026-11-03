@@ -39,7 +39,7 @@ Att köra nedladdade binärer (t.ex. pluginval) lokalt nekas – pluginval/auval
 
 ## Release
 Push till main → `.github/workflows/build.yml` kör Linux (tester + pluginval), macOS (`macos-26`, universal, ad hoc-signerat,
-pluginval + auval) och Windows (pluginval). Byter man macOS-runner: byt även cache-nyckeln (Xcode-sökvägar ligger i cachen). Release: GitHub-verktyget `actions_run_trigger` → `run_workflow`,
+pluginval + auval) och Windows (pluginval). Byter man macOS-runner eller repo-namn: byt även cache-nycklarna (sökvägar ligger i cachen). Release: GitHub-verktyget `actions_run_trigger` → `run_workflow`,
 `build.yml`, ref `main`, inputs `{"release_tag": "vX.Y.Z"}`. Kolla sedan `get_release_by_tag` att
 `Bakelit-mac.zip` och `Bakelit-windows.zip` finns. Höj `project(... VERSION x.y.z)` i CMakeLists.txt.
 Commits: författare `Hans Falk <hans.falk@gmail.com>`. Pusha direkt till main (enmansprojekt).

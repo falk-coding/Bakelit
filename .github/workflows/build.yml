@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: juce-linux-${{ hashFiles('CMakeLists.txt') }}
+          key: bakelit-juce-linux-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Bygg
         run: |
@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: juce-macos26-${{ hashFiles('CMakeLists.txt') }}   # byt nyckel när runner-avbilden byts (sökvägar till Xcode sparas i cachen)
+          key: bakelit-juce-macos26-${{ hashFiles('CMakeLists.txt') }}   # byt nyckel när runner-avbilden byts (sökvägar till Xcode sparas i cachen)
 
       - name: "Bygg (universal: Apple Silicon + Intel)"
         run: |
@@ -148,7 +148,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: juce-win-${{ hashFiles('CMakeLists.txt') }}
+          key: bakelit-juce-win-${{ hashFiles('CMakeLists.txt') }}
 
       - name: Bygg (x64, statisk runtime – kräver inget extra installerat)
         shell: bash
