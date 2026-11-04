@@ -1,4 +1,5 @@
 #include "Sequencer.h"
+#include "Arrangement.h"
 #include <algorithm>
 #include <cmath>
 
@@ -579,10 +580,87 @@ namespace
     }
 }
 
+namespace
+{
+    // Låtform för synthen: tyst/gles intro, uppbyggnad, glest och lågt i breaket, spänning i buildup
+    // (tätare, starkare, rullningar), extra styrka på dropet, outro som tunnas ut.
+    void applyArrangement (const Settings& s, std::vector<NoteEvent>& events)
+    {
+        using falk::arr::Part;
+        std::vector<NoteEvent> result;
+        result.reserve (events.size() * 2);
+        for (const auto& src : events)
+        {
+            auto e = src;
+            const auto sec = falk::arr::sectionAt (s.arrForm, e.ppqOn, s.arrStart, s.arrEnd, s.barPpq);
+            const auto tick = (int64_t) std::llround (e.ppqOn * 960.0);
+            const double r = hash01 (tick, 0x41525241ull);
+            double keep = 1.0, gain = 1.0;
+            switch (sec.part)
+            {
+                case Part::intro:
+                    keep = sec.progress < 0.5 ? 0.0 : 0.5;
+                    gain = 0.7;
+                    break;
+                case Part::build:
+                    keep = 0.5 + 0.5 * sec.progress;
+                    gain = 0.7 + 0.3 * sec.progress;
+                    break;
+                case Part::breakdown:
+                    keep = 0.35;
+                    gain = 0.55;
+                    break;
+                case Part::buildup:
+                    keep = 0.5 + 0.5 * sec.progress;
+                    gain = 0.5 + 0.5 * sec.progress;
+                    break;
+                case Part::outro:
+                    keep = 1.0 - 0.8 * sec.progress;
+                    gain = 1.0 - 0.5 * sec.progress;
+                    break;
+                case Part::main:
+                    gain = sec.drop ? 1.15 : 1.0;
+                    break;
+                case Part::none:
+                default:
+                    break;
+            }
+            if (r >= keep)
+                continue;
+            e.velocity = (float) std::clamp ((double) e.velocity * gain, 0.08, 1.0);
+
+            if (sec.part == Part::buildup)
+            {
+                const double barPpq = std::max (0.25, s.barPpq);
+                const int fromEnd = sec.partLength - 1 - sec.barInPart;
+                const double barStart = s.arrStart + (double) sec.bar * barPpq;
+                if (fromEnd == 0 && e.ppqOn >= barStart + 0.875 * barPpq - 1.0e-9)
+                    continue;                                   // andningspaus före dropet
+                if (fromEnd <= 1)
+                {
+                    // De två sista takterna: varje ton blir en rullning.
+                    const double span = std::clamp (e.ppqOff - e.ppqOn, s.stepPpq * 0.5, s.stepPpq * 2.0);
+                    for (int k = 0; k < 2; ++k)
+                    {
+                        auto f = e;
+                        f.tied = false;
+                        f.ppqOn = e.ppqOn + k * span / 2.0;
+                        f.ppqOff = f.ppqOn + span / 2.0 * 0.8;
+                        result.push_back (f);
+                    }
+                    continue;
+                }
+            }
+            result.push_back (e);
+        }
+        events.swap (result);
+    }
+}
+
 void generate (const Pattern& pattern, const Settings& s, const Chord& chord,
                double fromPpq, double toPpq, std::vector<NoteEvent>& out)
 {
-    if (s.evolve <= 0.0f && s.fills <= 0.0f)
+    if (s.evolve <= 0.0f && s.fills <= 0.0f && s.arrForm <= falk::arr::off)
     {
         generateBase (pattern, s, chord, fromPpq, toPpq, out);
         return;
@@ -592,6 +670,8 @@ void generate (const Pattern& pattern, const Settings& s, const Chord& chord,
     std::vector<NoteEvent> tmp;
     generateBase (pattern, s, chord, fromPpq - 2.0 * std::max (0.125, s.stepPpq), toPpq, tmp);
     applySong (s, tmp);
+    if (s.arrForm > falk::arr::off)
+        applyArrangement (s, tmp);
     std::stable_sort (tmp.begin(), tmp.end(), [] (const NoteEvent& a, const NoteEvent& b) { return a.ppqOn < b.ppqOn; });
     for (const auto& e : tmp)
         if (e.ppqOn >= fromPpq && e.ppqOn < toPpq)
@@ -623,6 +703,15 @@ juce::MidiFile renderMidiFile (const Pattern& pattern, const Settings& settings,
     auto sig = juce::MidiMessage::timeSignatureMetaEvent (timeSigNum, timeSigDen);
     sig.setTimeStamp (0);
     track.addEvent (sig);
+    // Låtformens delar som markörer (Intro, Build, Break, Buildup, Drop, Outro) – samma takter som i Slagg.
+    if (settings.arrForm > falk::arr::off)
+        for (const auto& [ppq, name] : falk::arr::markers (settings.arrForm, settings.arrStart, settings.arrEnd, settings.barPpq))
+            if (ppq >= fromPpq && ppq < toPpq)
+            {
+                auto m = juce::MidiMessage::textMetaEvent (6, name);
+                m.setTimeStamp (std::round ((ppq - fromPpq) * ticksPerQuarter));
+                track.addEvent (m);
+            }
 
     for (const auto& o : out)
     {

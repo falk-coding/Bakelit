@@ -333,6 +333,7 @@ SeqPanel::SeqPanel (StesoLeadProcessor& p) : processor (p), grid (p), poly (p), 
     songControls.push_back (std::make_unique<Control> (processor.apvts, pid::songEvolve, "Evolve", colours::accent2, false));
     songControls.push_back (std::make_unique<Control> (processor.apvts, pid::songFills, "Fills", colours::accent2, false));
     songControls.push_back (std::make_unique<Control> (processor.apvts, pid::songPhrase, "Phrase", colours::accent2, true));
+    songControls.push_back (std::make_unique<Control> (processor.apvts, pid::arrForm, "Form", colours::accent2, true));
     for (auto& c : songControls)
         addAndMakeVisible (*c);
 
@@ -484,7 +485,7 @@ void SeqPanel::paint (juce::Graphics& g)
         const auto a = songArea.toFloat();
         g.setColour (colours::hairline.withAlpha (0.35f));
         g.drawRoundedRectangle (a.reduced (1.0f), 3.0f, 1.0f);
-        auto t = a.withWidth (92.0f).reduced (10.0f, 8.0f);
+        auto t = a.withWidth (58.0f).reduced (8.0f, 8.0f);
         g.setFont (panelFont (15.0f, false).withExtraKerningFactor (0.2f));
         g.setColour (colours::text);
         g.drawText (juce::String::fromUTF8 ("LÅT"), t.removeFromTop (t.getHeight() * 0.5f), juce::Justification::bottomLeft);
@@ -514,11 +515,11 @@ void SeqPanel::resized()
     songArea = right.removeFromTop (60);
     {
         auto sa = songArea.reduced (0, 1);
-        sa.removeFromLeft (92);
-        const int cw = sa.getWidth() / 3;
-        songControls[0]->setBounds (sa.removeFromLeft (cw - 10));
-        songControls[1]->setBounds (sa.removeFromLeft (cw - 10));
-        songControls[2]->setBounds (sa);
+        sa.removeFromLeft (58);
+        songControls[0]->setBounds (sa.removeFromLeft (52));
+        songControls[1]->setBounds (sa.removeFromLeft (52));
+        songControls[2]->setBounds (sa.removeFromLeft (82));
+        songControls[3]->setBounds (sa);
     }
     right.removeFromTop (6);
     rangeMode.setBounds (right.removeFromTop (26));

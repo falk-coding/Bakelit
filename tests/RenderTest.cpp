@@ -6,6 +6,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Source/PluginProcessor.h"
 #include "../Source/PluginEditor.h"
+#include "../Source/seq/Arrangement.h"
 
 
 namespace
@@ -276,7 +277,7 @@ void testState()
 
 struct TestPlayHead : juce::AudioPlayHead
 {
-    double ppq = 0.0, bpm = 120.0;
+    double ppq = 0.0, bpm = 120.0, loopStart = 16.0, loopEnd = 48.0;
     bool playing = true;
 
     juce::Optional<PositionInfo> getPosition() const override
@@ -286,7 +287,7 @@ struct TestPlayHead : juce::AudioPlayHead
         p.setBpm (bpm);
         p.setIsPlaying (playing);
         p.setTimeSignature (TimeSignature { 4, 4 });
-        p.setLoopPoints (LoopPoints { 16.0, 48.0 });
+        p.setLoopPoints (LoopPoints { loopStart, loopEnd });
         return p;
     }
 };
@@ -774,6 +775,63 @@ void testSongMode()
     check (songs == 4, "väntade 4 Song-presets, hittade " + juce::String (songs));
 }
 
+void testArrangement()
+{
+    std::cout << "Låtform (arrangemang):" << std::endl;
+    std::unique_ptr<StesoLeadProcessor> proc (dynamic_cast<StesoLeadProcessor*> (createPluginFilter()));
+    int song = -1;
+    for (int i = 0; i < proc->getNumPrograms(); ++i)
+        if (proc->getProgramName (i) == "Song - Acid Night") song = i;
+    proc->setCurrentProgram (song);
+    if (auto* p = proc->apvts.getParameter (steso::pid::arrForm))      p->setValueNotifyingHost (p->convertTo0to1 ((float) falk::arr::classic));
+    if (auto* p = proc->apvts.getParameter (steso::pid::seqMidiOut))   p->setValueNotifyingHost (1.0f);
+
+    // Klassisk form över 160 takter: intro 0–15, uppbyggnad 16–31, huvuddel 32–63, break 64–87, buildup 88–95, drop 96.
+    const auto file = proc->writeMidiExport (0.0, 640.0, "test-arr.mid");
+    const auto notes = readMidiFile (file, 0.0);
+    auto count = [&] (int fromBar, int toBar)
+    {
+        int c = 0;
+        for (const auto& n : notes) c += (n.ppq >= fromBar * 4.0 && n.ppq < toBar * 4.0) ? 1 : 0;
+        return c;
+    };
+    const double main = count (32, 64) / 32.0, brk = count (64, 88) / 24.0, lastTwo = count (94, 96) / 2.0;
+    check (count (0, 8) == 0, "synthen spelar i introts första halva");
+    check (brk < main * 0.6 && brk > 0.0, "breaket är inte glest (" + juce::String (brk, 1) + " mot " + juce::String (main, 1) + " toner/takt)");
+    check (lastTwo > brk * 1.5, "ingen spänning i buildup (" + juce::String (lastTwo, 1) + " toner/takt)");
+    // Andningspaus: inget under sista åttondelen före dropet.
+    int inGap = 0;
+    for (const auto& n : notes) inGap += (n.ppq >= 95.875 * 4.0 && n.ppq < 96.0 * 4.0) ? 1 : 0;
+    check (inGap == 0, "ingen paus före dropet");
+    juce::StringArray markers;
+    {
+        juce::FileInputStream in (file);
+        juce::MidiFile mf;
+        if (in.openedOk() && mf.readFrom (in))
+            for (int t = 0; t < mf.getNumTracks(); ++t)
+                for (const auto* e : *mf.getTrack (t))
+                    if (e->message.isTextMetaEvent() && e->message.getMetaEventType() == 6)
+                        markers.add (e->message.getTextFromTextMetaEvent());
+    }
+    check (markers.contains ("Break") && markers.contains ("Drop") && markers.contains ("Outro"), "markörerna saknas");
+
+    // Live = export: 104 takter med DAW:ns markörer över hela låten.
+    TestPlayHead ph;
+    ph.loopStart = 0.0;
+    ph.loopEnd = 640.0;
+    int ons = 0, offs = 0;
+    const auto live = runTransport (*proc, ph, 104.0, { 48 }, ons, offs);
+    std::vector<SeqNote> exported;
+    for (const auto& n : readMidiFile (proc->writeMidiExport (0.0, 640.0, "test-arr2.mid"), 0.0))
+        if (n.ppq < 104.0 * 4.0) exported.push_back (n);
+    juce::String why;
+    const bool same = sameNotes (live, exported, why);
+    check (same, "låtform: live skiljer sig från exporten: " + why);
+    check (ons == offs && proc->getActiveVoiceCount() == 0, "låtform: hängande toner");
+    std::cout << "  huvuddel " << juce::String (main, 1) << ", break " << juce::String (brk, 1) << ", buildup-slut "
+              << juce::String (lastTwo, 1) << " toner/takt, " << markers.size() << " markörer, live = export" << std::endl;
+}
+
 void testStress()
 {
     std::cout << "Stresstest (slumpade inställningar):" << std::endl;
@@ -933,6 +991,7 @@ int main (int argc, char** argv)
     testPolyrhythm();
     testSubharmonics();
     testSongMode();
+    testArrangement();
     testStress();
     testUserPresets();
     if (shot != juce::File())

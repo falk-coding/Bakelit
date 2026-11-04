@@ -213,6 +213,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
     subh->addChild (std::make_unique<APF> (id2 (pid::songEvolve), "Song Evolve", Range (0.0f, 1.0f), 0.0f, percentAttr()));
     subh->addChild (std::make_unique<APF> (id2 (pid::songFills), "Song Fills", Range (0.0f, 1.0f), 0.0f, percentAttr()));
     subh->addChild (std::make_unique<APC> (id2 (pid::songPhrase), "Song Phrase", songPhraseNames, 1));
+    subh->addChild (std::make_unique<APC> (id2 (pid::arrForm), "Song Form", arrFormNames, 0));
 
     layout.add (std::move (osc1), std::move (osc2), std::move (mix), std::move (filter), std::move (fenv),
                 std::move (aenv), std::move (lfo), std::move (voice), std::move (fx), std::move (seqGroup), std::move (fat),
@@ -255,6 +256,7 @@ void ParamPointers::bind (juce::AudioProcessorValueTreeState& s)
     mixSubh1 = p (pid::mixSubh1); mixSubh2 = p (pid::mixSubh2);
     osc3SubDiv = p (pid::osc3SubDiv); mixSubh3 = p (pid::mixSubh3); osc3PW = p (pid::osc3PW);
     songEvolve = p (pid::songEvolve); songFills = p (pid::songFills); songPhrase = p (pid::songPhrase);
+    arrForm = p (pid::arrForm);
     for (int l = 0; l < 4; ++l)
     {
         auto& L = polyLane[(size_t) l];

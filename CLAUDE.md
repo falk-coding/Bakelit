@@ -44,6 +44,12 @@ pluginval + auval) och Windows (pluginval). Byter man macOS-runner eller repo-na
 `Bakelit-mac.zip` och `Bakelit-windows.zip` finns. Höj `project(... VERSION x.y.z)` i CMakeLists.txt.
 Commits: författare `Hans Falk <hans.falk@gmail.com>`. Pusha direkt till main (enmansprojekt).
 
+## Gemensam låtform (Slagg + Bakelit)
+`Arrangement.h` (`falk::arr`) är **identisk** i Slagg (`Source/Arrangement.h`) och Bakelit (`Source/seq/Arrangement.h`).
+Ändra alltid båda samtidigt – annars hamnar breaks/drops på olika takter. Parametern heter `arrForm` i båda
+(Off/Classic/Long break/Hypnotic/Short). Live räknas formen från DAW:ns markörer, vid dragning från exportområdet.
+Break 32 takter (Short: 16), sista 8 = buildup; första takten efter break = drop. Hans val: 32 takter räcker.
+
 ## Var saker finns
 | Del | Fil |
 |---|---|
@@ -59,7 +65,13 @@ Commits: författare `Hans Falk <hans.falk@gmail.com>`. Pusha direkt till main (
 | Installation | `packaging/mac`, `packaging/windows` |
 | Manual sv/en | `docs/Manual-*.md` → `tools/make_manual.sh` → `docs/Manual-*.pdf` (följer med i release-zipparna). Uppdatera vid nya funktioner! |
 
-## Status (2026-11-04, v1.9.0)
+## Status (2026-11-04, v1.10.0 – låtform)
+v1.10: Form (låtform) i Låt-rutan, samma som Slagg. Synth: introts första halva tyst, sedan gles; uppbyggnad tätare;
+break glest (35 %) och lågt; buildup tätare/starkare med rullningar sista 2 takterna och paus sista åttondelen; drop +15 %
+styrka; outro tunnas ut. Markörer i MIDI-filen. Test: tyst introstart, glest break, spänning i buildup, paus, markörer,
+live = export 104 takter.
+
+### v1.9.0
 v1.9: varumärket heter **falk elektro** (gemener) överallt synligt (DAW-tillverkare via COMPANY_NAME, logga, installation,
 manual). Plugin-ID Falk/Stsl och BUNDLE_ID oförändrade. Egna förinställningar flyttas en gång från
 Dokument/Falk Instruments/Bakelit/Presets till Dokument/falk elektro/Bakelit/Presets. Huvudet: loggan "falk elektro"

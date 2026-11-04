@@ -80,6 +80,10 @@ steso::seq::Settings StesoLeadProcessor::currentSeqSettings() const
     s.evolve = params.songEvolve->load();
     s.fills = params.songFills->load();
     s.phraseBars = steso::songPhraseBars ((int) params.songPhrase->load());
+    // Låtform: live räknas den från DAW:ns markörer (utan markörer: från takt 1, utan slut).
+    s.arrForm = (int) params.arrForm->load();
+    s.arrStart = hostHasLoop.load() ? hostLoopStart.load() : 0.0;
+    s.arrEnd = hostHasLoop.load() ? hostLoopEnd.load() : 0.0;
     s.polyBars = (int) params.polyBars->load();
     for (size_t l = 0; l < (size_t) polyLanes; ++l)
     {
@@ -130,6 +134,8 @@ juce::File StesoLeadProcessor::writeMidiExport (double fromPpq, double toPpq, co
         settings.mode = polyBeforeExport ? steso::seq::Mode::poly
                                          : (steso::seq::Mode) juce::jlimit (1, 2, modeBeforeExport);
 
+    settings.arrStart = fromPpq;   // dragningen: låtformen sträcks över just det dragna området
+    settings.arrEnd = toPpq;
     const auto host = getHostInfo();
     const auto midiFile = steso::seq::renderMidiFile (pattern, settings, getExportChord(), fromPpq, toPpq,
                                                       host.bpm, host.timeSigNum, host.timeSigDen);

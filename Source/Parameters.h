@@ -95,6 +95,7 @@ namespace pid
     inline constexpr const char* songEvolve  = "songEvolve";
     inline constexpr const char* songFills   = "songFills";
     inline constexpr const char* songPhrase  = "songPhrase";
+    inline constexpr const char* arrForm     = "arrForm";     // låtform (falk::arr), Off som standard
 
     inline constexpr const char* polyOn      = "polyOn";
     inline constexpr const char* polyBars    = "polyBars";
@@ -113,6 +114,8 @@ namespace pid
     inline const char* polyLaneSteps (int lane)  { return polyStepsIds[lane & 3]; }
 } // namespace pid
 
+// Samma ordning som falk::arr::Form (seq/Arrangement.h, gemensam med Slagg).
+inline const juce::StringArray arrFormNames { "Off", "Classic", "Long break", "Hypnotic", "Short" };
 inline const juce::StringArray songPhraseNames { "4 bars", "8 bars", "16 bars", "32 bars" };
 inline int songPhraseBars (int index) { static constexpr int b[] { 4, 8, 16, 32 }; return b[juce::jlimit (0, 3, index)]; }
 
@@ -153,6 +156,7 @@ struct ParamPointers
     std::atomic<float>* mixSubh1 {}; std::atomic<float>* mixSubh2 {};
     std::atomic<float>* osc3SubDiv {}; std::atomic<float>* mixSubh3 {}; std::atomic<float>* osc3PW {};
     std::atomic<float>* songEvolve {}; std::atomic<float>* songFills {}; std::atomic<float>* songPhrase {};
+    std::atomic<float>* arrForm {};
     struct PolyLane
     {
         std::atomic<float>* on {}; std::atomic<float>* type {}; std::atomic<float>* pulses {};

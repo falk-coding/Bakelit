@@ -95,6 +95,9 @@ struct Settings
     float evolve = 0.0f;       // 0..1: tätheten andas per fras, styrkan byggs upp genom frasen, oktavlyft mot slutet
     float fills = 0.0f;        // 0..1: chans till fill (rullningar som stiger) i frasens sista taktslag
     int phraseBars = 8;        // frasens längd i takter
+    // Låtform (falk::arr, samma som Slagg): intro, uppbyggnad, huvuddel, break 32 takter med buildup, drop, outro.
+    int arrForm = 0;
+    double arrStart = 0.0, arrEnd = 0.0;   // arrangemangets gränser (markörerna / exportområdet)
 
     double polyCyclePpq() const noexcept { return std::max (1, polyBars) * std::max (0.25, barPpq); }
 };
