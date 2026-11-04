@@ -6,7 +6,7 @@ if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
 endif()
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minsta macOS-version")
 
-project(StesoLead VERSION 1.8.0 LANGUAGES C CXX)
+project(StesoLead VERSION 1.9.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,10 +32,10 @@ if(APPLE)
 endif()
 
 juce_add_plugin(StesoLead
-    # Synligt namn: Falk Instruments – Bakelit. Tillverkar- och pluginkoden (Falk/Stsl) får ALDRIG ändras:
+    # Synligt namn: falk elektro – Bakelit (varumärket hette Falk Instruments till nov 2026). Tillverkar- och pluginkoden (Falk/Stsl) får ALDRIG ändras:
     # DAW:ar känner igen pluginet på dem, så sparade projekt fortsätter fungera.
-    COMPANY_NAME "Falk Instruments"
-    COMPANY_WEBSITE "https://falkinstruments.com"
+    COMPANY_NAME "falk elektro"
+    # BUNDLE_ID är osynligt och behålls från tiden som Falk Instruments (byte kan ge dubbla AU-plugins).
     BUNDLE_ID "com.falkinstruments.bakelit"
     PLUGIN_MANUFACTURER_CODE Falk
     PLUGIN_CODE Stsl

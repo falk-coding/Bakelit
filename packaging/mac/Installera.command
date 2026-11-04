@@ -1,5 +1,5 @@
 #!/bin/bash
-# Installerar Bakelit (Falk Instruments) – VST3 + AU – för den inloggade användaren och tar bort
+# Installerar Bakelit (falk elektro) – VST3 + AU – för den inloggade användaren och tar bort
 # macOS-karantänen så att DAW:en kan ladda pluginet. Ingen admin-behörighet behövs.
 set -e
 cd "$(dirname "$0")"
@@ -24,7 +24,7 @@ echo "Klart!"
 echo "  VST3: $VST3_DIR/Bakelit.vst3"
 echo "  AU:   $AU_DIR/Bakelit.component"
 echo ""
-echo "Starta om din DAW. Bakelit finns under Instruments → Falk Instruments → Bakelit."
+echo "Starta om din DAW. Bakelit finns under Instruments → falk elektro → Bakelit."
 echo "Logic/GarageBand använder AU, övriga (Reason, Ableton, Cubase …) VST3."
 echo ""
 read -n 1 -s -r -p "Tryck på valfri tangent för att stänga."

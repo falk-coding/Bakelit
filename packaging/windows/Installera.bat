@@ -1,5 +1,5 @@
 @echo off
-rem Installerar Bakelit.vst3 (Falk Instruments) i Windows standardmapp for VST3-plugins.
+rem Installerar Bakelit.vst3 (falk elektro) i Windows standardmapp for VST3-plugins.
 rem Kraver administratorsbehorighet (mappen ligger under Program Files).
 
 net session >nul 2>&1
@@ -29,6 +29,6 @@ echo.
 echo Klart! Bakelit ar installerat i:
 echo   %DST%
 echo.
-echo Starta om din DAW (t.ex. Reason). Bakelit finns under Instruments - Falk Instruments.
+echo Starta om din DAW (t.ex. Reason). Bakelit finns under Instruments - falk elektro.
 echo.
 pause

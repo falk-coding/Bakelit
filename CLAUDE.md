@@ -1,7 +1,7 @@
-# Bakelit (Falk Instruments) – arbetsanteckningar för Claude
+# Bakelit (falk elektro) – arbetsanteckningar för Claude
 
 Polyfon analog-inspirerad synth som VST3 (Mac + Windows) och AU (Mac), byggd med JUCE 8.0.10.
-Produkt: **Bakelit**, varumärke: **Falk Instruments** (ägs av Hans enskilda firma ijoli, liksom synkaoss).
+Produkt: **Bakelit**, varumärke: **falk elektro** – alltid gemener (hette Falk Instruments till nov 2026; Hans tar fram ett varumärkeskit) (ägs av Hans enskilda firma ijoli, liksom synkaoss).
 Repo: **github.com/falk-coding/Bakelit** (hette StesoLead till 2026-11-01; gamla länkar omdirigeras).
 Internt kodnamn **StesoLead** (klassnamn, CMake-target, mappnamn i molnmiljön) – syns aldrig för användaren.
 GitHub-verktygen: använd `owner: falk-coding`, `repo: bakelit`.
@@ -59,7 +59,14 @@ Commits: författare `Hans Falk <hans.falk@gmail.com>`. Pusha direkt till main (
 | Installation | `packaging/mac`, `packaging/windows` |
 | Manual sv/en | `docs/Manual-*.md` → `tools/make_manual.sh` → `docs/Manual-*.pdf` (följer med i release-zipparna). Uppdatera vid nya funktioner! |
 
-## Status (2026-11-01, v1.8.0)
+## Status (2026-11-04, v1.9.0)
+v1.9: varumärket heter **falk elektro** (gemener) överallt synligt (DAW-tillverkare via COMPANY_NAME, logga, installation,
+manual). Plugin-ID Falk/Stsl och BUNDLE_ID oförändrade. Egna förinställningar flyttas en gång från
+Dokument/Falk Instruments/Bakelit/Presets till Dokument/falk elektro/Bakelit/Presets. Huvudet: loggan "falk elektro"
+längst upp till vänster, sedan produktnamnet (`drawBrandHeader`); versionen bara i loggans tooltip och svagt nere till höger.
+Koppartopp på Cutoff (falk elektros signatur, samma i Slagg). Loggan är provisorisk tills Hans varumärkeskit finns.
+
+### v1.8.0
 Klart: motor, Fat-funktioner, sekvenser med MIDI-export/markörer, mörkt slitet skin (v1.7: kall nattsvart plåt, punktljus över allt, rost/ärg, korn, slitna stålrattar, präglad logga) med svenska texter,
 rack-layout med fällbar stegsekvenserare/klaviatur, 149 presets, egna förinställningar, namnbyte till Bakelit,
 Polyrytm-läge (v1.7: 4 spår Bar/Div, euklid, tonhöjdssteg, ringvisning; parametern `polyOn` går före `seqMode`).
@@ -72,6 +79,6 @@ Idé till senare: låta Polyrytm-spåren styra undertonernas delare (som origina
 1. Hans lyssnar och testar i Reason (ljud, presets, dra MIDI, fönsterstorlek vid utfällning) – inget är provlyssnat än.
 2. Byggflödet för privat repo: Mac/Windows bara vid release (Linux-tester vid push) – gör INNAN repot blir privat.
 3. Signering: Apple Developer (notarisering) + Windows-kodsignering; riktiga installationsprogram (.pkg/.exe).
-4. JUCE-licens för sluten kod (kolla juce.com), varumärkessök Falk Instruments/Bakelit (TMview, klass 9), domän falkinstruments.com.
+4. JUCE-licens för sluten kod (kolla juce.com), varumärkessök falk elektro/Bakelit/Slagg (TMview, klass 9), domän för falk elektro.
 5. Betatest, ljuddemos, produktsida, butik via merchant of record (Paddle/Lemon Squeezy).
 Rack Extension (Reason) avvaktas – stort jobb, kräver lokal testning hos Hans.

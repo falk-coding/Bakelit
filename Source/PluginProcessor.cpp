@@ -510,12 +510,22 @@ juce::File StesoLeadProcessor::getUserPresetFolder()
     if (userPresetFolderOverride() != juce::File())
         return userPresetFolderOverride();
     const auto docs = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory);
-    auto folder = docs.getChildFile ("Falk Instruments").getChildFile ("Bakelit").getChildFile ("Presets");
+    auto folder = docs.getChildFile ("falk elektro").getChildFile ("Bakelit").getChildFile ("Presets");
 
-    // Flytta med egna förinställningar från tiden då pluginet hette StesoLead (görs en gång).
-    const auto legacy = docs.getChildFile ("StesoLead").getChildFile ("Presets");
-    if (! folder.isDirectory() && legacy.isDirectory())
-        legacy.copyDirectoryTo (folder);
+    // Flytta med egna förinställningar från tidigare namn (görs en gång): varumärket hette Falk Instruments
+    // till nov 2026, och pluginet hette StesoLead innan dess.
+    if (! folder.isDirectory())
+    {
+        for (const auto& old : { docs.getChildFile ("Falk Instruments").getChildFile ("Bakelit").getChildFile ("Presets"),
+                                 docs.getChildFile ("StesoLead").getChildFile ("Presets") })
+        {
+            if (old.isDirectory())
+            {
+                old.copyDirectoryTo (folder);
+                break;
+            }
+        }
+    }
     return folder;
 }
 

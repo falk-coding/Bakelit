@@ -120,6 +120,35 @@ void drawSectionFrame (juce::Graphics& g, juce::Rectangle<float> r, const juce::
     }
 }
 
+float drawBrandHeader (juce::Graphics& g, juce::Rectangle<float> area, const juce::String& product)
+{
+    // falk elektro-loggan (provisorisk tills varumärkeskitet finns): gemener, lugn, ljus – längst upp till vänster.
+    const auto brandFont = panelFont (21.0f, false).withExtraKerningFactor (0.06f);
+    const juce::String brand ("falk elektro");
+    const float bw = juce::GlyphArrangement::getStringWidth (brandFont, brand);
+    g.setFont (brandFont);
+    g.setColour (juce::Colours::black.withAlpha (0.6f));
+    g.drawText (brand, area.translated (0.0f, 1.0f), juce::Justification::centredLeft);
+    g.setColour (colours::text.withAlpha (0.92f));
+    g.drawText (brand, area, juce::Justification::centredLeft);
+
+    // Tunn graverad skiljelinje, sedan produktnamnet präglat i plåten.
+    const float sx = area.getX() + bw + 16.0f;
+    g.setColour (colours::hairline.withAlpha (0.4f));
+    g.drawLine (sx, area.getY() + 10.0f, sx, area.getBottom() - 10.0f, 1.0f);
+
+    auto p = area.withTrimmedLeft (bw + 32.0f);
+    const auto title = panelFont (28.0f).withExtraKerningFactor (0.24f);
+    g.setFont (title);
+    g.setColour (juce::Colours::black.withAlpha (0.7f));
+    g.drawText (product, p.translated (-0.8f, -0.8f), juce::Justification::centredLeft);
+    g.setColour (juce::Colours::white.withAlpha (0.07f));
+    g.drawText (product, p.translated (0.8f, 0.9f), juce::Justification::centredLeft);
+    g.setColour (colours::metal.brighter (0.6f));
+    g.drawText (product, p, juce::Justification::centredLeft);
+    return bw + 32.0f + juce::GlyphArrangement::getStringWidth (title, product);
+}
+
 void drawRackEar (juce::Graphics& g, juce::Rectangle<float> r)
 {
     // Böjd plåt: lite ljusare än panelen, mörk fog mot panelen.
@@ -408,8 +437,12 @@ void LookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int width, 
     // Kall, sliten ståltopp: koncentriska slipspår + matt reflex uppifrån vänster.
     const float cap = skirt * 0.60f;
     const float tone = 0.75f + wear.nextFloat() * 0.35f;
-    g.setGradientFill (juce::ColourGradient (juce::Colour (0xff6c7276).withMultipliedBrightness (tone), c.x - cap * 0.6f, c.y - cap * 0.8f,
-                                             juce::Colour (0xff121315), c.x + cap * 0.6f, c.y + cap * 0.9f, false));
+    // falk elektros signatur: alla Cutoff-rattar har en topp av sliten koppar (samma på alla instrument).
+    const bool copper = slider.getName().endsWithIgnoreCase ("cutoff");
+    const auto capLight = copper ? juce::Colour (0xffb8764a) : juce::Colour (0xff6c7276);
+    const auto capDark  = copper ? juce::Colour (0xff2a140a) : juce::Colour (0xff121315);
+    g.setGradientFill (juce::ColourGradient (capLight.withMultipliedBrightness (tone), c.x - cap * 0.6f, c.y - cap * 0.8f,
+                                             capDark, c.x + cap * 0.6f, c.y + cap * 0.9f, false));
     g.fillEllipse (c.x - cap, c.y - cap, cap * 2.0f, cap * 2.0f);
     for (float rr = cap * 0.12f; rr < cap; rr += 1.2f)
     {
@@ -587,6 +620,7 @@ Control::Control (juce::AudioProcessorValueTreeState& apvts, const juce::String&
     else
     {
         slider = std::make_unique<juce::Slider> (juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox);
+        slider->setName (paramId);   // eget slitage per ratt + koppartopp på Cutoff
         slider->setName (paramId);   // ger varje ratt eget, fast slitage
         slider->setColour (juce::Slider::rotarySliderFillColourId, colour);
         slider->setPopupDisplayEnabled (true, true, nullptr, 1500);
@@ -796,6 +830,8 @@ StesoLeadEditor::StesoLeadEditor (StesoLeadProcessor& p)
     keyboard.setWantsKeyboardFocus (false);
     content.addAndMakeVisible (keyboard);
     content.addAndMakeVisible (seqPanel);
+    brandHotspot.setTooltip ("falk elektro  ·  Bakelit v" STESO_VERSION);
+    content.addAndMakeVisible (brandHotspot);
     // Panelerna skapades före setLookAndFeel: låt alla barn (t.ex. sifferrutor) byggas om med vårt skin.
     sendLookAndFeelChange();
 
@@ -928,22 +964,13 @@ void StesoLeadEditor::paint (juce::Graphics& g)
         if (showKeys) { uy += unitGap; spot (uy, keysH); }
     }
 
-    // Logga: präglad i plåten, nästan ton-i-ton (skugga uppåt-vänster, ljuskant nedåt-höger).
-    auto header = juce::Rectangle<float> ((float) earW + 20.0f, 8.0f, 600.0f, 44.0f);
-    const auto title = panelFont (30.0f).withExtraKerningFactor (0.22f);
-    g.setFont (title);
-    g.setColour (juce::Colours::black.withAlpha (0.7f));
-    g.drawText ("BAKELIT", header.translated (-0.8f, -0.8f), juce::Justification::centredLeft);
-    g.setColour (juce::Colours::white.withAlpha (0.07f));
-    g.drawText ("BAKELIT", header.translated (0.8f, 0.9f), juce::Justification::centredLeft);
-    g.setColour (colours::metal.brighter (0.55f));
-    g.drawText ("BAKELIT", header, juce::Justification::centredLeft);
-
-    const float w = juce::GlyphArrangement::getStringWidth (title, "BAKELIT");
-    auto sub = header.withTrimmedLeft (w + 14.0f).translated (0.0f, 4.0f);
-    g.setFont (panelFont (11.5f, false).withExtraKerningFactor (0.2f));
-    g.setColour (colours::dimText.withAlpha (0.75f));
-    g.drawText (juce::String::fromUTF8 ("FALK INSTRUMENTS  ·  v" STESO_VERSION), sub, juce::Justification::centredLeft);
+    // falk elektro längst upp till vänster, sedan produktnamnet. Versionen står undangömt nere i hörnet
+    // (och i loggans tooltip).
+    drawBrandHeader (g, juce::Rectangle<float> ((float) earW + 20.0f, 8.0f, 600.0f, 44.0f), "BAKELIT");
+    g.setFont (panelFont (9.0f, false));
+    g.setColour (colours::dimText.withAlpha (0.35f));
+    g.drawText ("v" STESO_VERSION, juce::Rectangle<float> ((float) (earW + innerW) - 70.0f, (float) synthH - 14.0f, 60.0f, 12.0f),
+                juce::Justification::centredRight);
 }
 
 void StesoLeadEditor::resized()
@@ -954,6 +981,7 @@ void StesoLeadEditor::resized()
     // --- Synthenheten
     auto r = juce::Rectangle<int> (earW, 0, innerW, synthH).reduced (12, 8);
 
+    brandHotspot.setBounds (earW + 20, 8, 330, 44);
     auto header = r.removeFromTop (46);
     header.removeFromLeft (404);
     nextButton.setBounds (header.removeFromRight (34).reduced (0, 8));

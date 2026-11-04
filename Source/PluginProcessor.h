@@ -78,7 +78,7 @@ public:
     bool isBypassedByExport() const noexcept { return bypassedByExport.load(); }
 
     //==============================================================================
-    // Egna förinställningar (filer i Dokument/Falk Instruments/Bakelit/Presets, filändelse .bakelit;
+    // Egna förinställningar (filer i Dokument/falk elektro/Bakelit/Presets, filändelse .bakelit;
     // äldre .stesolead-filer läses också)
     static juce::File getUserPresetFolder();
     static void setUserPresetFolder (const juce::File& folder);   // för tester

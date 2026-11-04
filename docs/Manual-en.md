@@ -1,6 +1,6 @@
 # Bakelit – manual
 
-**Falk Instruments · version 1.8**
+**falk elektro · version 1.9**
 
 Bakelit is a polyphonic analog-style synthesizer with three oscillators, subharmonics, two filter types, a step sequencer, an arpeggiator and polyrhythms. This manual takes you from installation to your own sound in ten minutes.
 
@@ -14,7 +14,7 @@ The panel labels are in Swedish with English in parentheses, e.g. *FILTERKURVA (
 
 1. Unzip `Bakelit-mac.zip`.
 2. Right-click **Installera.command** → **Open** (first time only, as the app is not yet notarized).
-3. Restart your DAW. Bakelit appears under *Falk Instruments*.
+3. Restart your DAW. Bakelit appears under *falk elektro*.
 
 **Windows (VST3)**
 
@@ -22,7 +22,7 @@ The panel labels are in Swedish with English in parentheses, e.g. *FILTERKURVA (
 2. Double-click **Installera.bat** and accept the administrator prompt.
 3. Restart your DAW.
 
-**Reason:** find Bakelit in the browser under *Instruments → Plugins → Falk Instruments*. Also works in Ableton, Logic (AU), Cubase, FL Studio, Bitwig, Studio One and Reaper.
+**Reason:** find Bakelit in the browser under *Instruments → Plugins → falk elektro*. Also works in Ableton, Logic (AU), Cubase, FL Studio, Bitwig, Studio One and Reaper.
 
 ---
 
@@ -77,7 +77,7 @@ Levels for **OSC 1–3**, **Sub Oct** (a classic square one octave below OSC 1) 
 | Knob | Does |
 |---|---|
 | Type | **Ladder** (round, fat, 24 dB) · **Steppe LP** (aggressive, raw) · **Steppe BP** (band-pass, nasal) |
-| Cutoff | Cutoff frequency – dark/bright |
+| Cutoff | Cutoff frequency – dark/bright (the copper knob – the same on every falk elektro instrument) |
 | Reso | Resonance – squeal at the cutoff; self-oscillates at the top |
 | Drive | Overdrive into the filter |
 | Env | How much the filter envelope opens the filter |
@@ -161,7 +161,7 @@ Four lanes, each with:
 - **Spara (Save)** stores all knobs and patterns. Same name = overwrite (asks first).
 - **Ta bort (Delete)** removes the selected user sound.
 - User sounds are at the top of the list under **Egna (User)**.
-- The files (`.bakelit`) live in **Documents/Falk Instruments/Bakelit/Presets** – copy the folder to back up or to move between Mac and Windows.
+- The files (`.bakelit`) live in **Documents/falk elektro/Bakelit/Presets** – copy the folder to back up or to move between Mac and Windows.
 - Your DAW project remembers everything, including patterns and folded-out panels.
 
 ---
@@ -178,4 +178,4 @@ Four lanes, each with:
 
 ---
 
-*Bakelit © Falk Instruments. VST is a trademark of Steinberg Media Technologies GmbH.*
+*Bakelit © falk elektro. VST is a trademark of Steinberg Media Technologies GmbH.*

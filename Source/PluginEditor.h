@@ -46,6 +46,7 @@ private:
     steso::ui::LookAndFeel lnf;
     // Visar hjälptexterna (setTooltip) när man hovrar – utan den syns inga tooltips alls.
     juce::TooltipWindow tooltipWindow { this, 700 };
+    juce::Label brandHotspot;   // osynlig yta över loggan: tooltip med versionen
 
     juce::Component content;
     juce::ComboBox presetBox;

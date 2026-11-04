@@ -1,11 +1,11 @@
-Bakelit (Falk Instruments) – installation på Mac
+Bakelit (falk elektro) – installation på Mac
 ================================
 
 Enklast:
 1. Dubbelklicka på "Installera.command".
    Första gången säger macOS att den inte kan öppnas → högerklicka på filen → Öppna → Öppna.
    (Eller: Systeminställningar → Integritet och säkerhet → "Öppna ändå".)
-2. Starta om Reason. Pluginet finns under Instruments → Falk Instruments → Bakelit.
+2. Starta om Reason. Pluginet finns under Instruments → falk elektro → Bakelit.
 
 Manuellt (om du hellre vill):
 1. Kopiera Bakelit.vst3 till  ~/Library/Audio/Plug-Ins/VST3/
@@ -25,4 +25,4 @@ Tips i pluginet:
 - Mode: Poly (8 röster), Mono (triggar om varje ton), Legato (glider utan omtrigg – bäst för leads).
 - Stegsekvenserare: fäll ut med Sekv. (Seq), välj Mode Seq eller Arp, håll en tangent och tryck play i DAW:en.
   Dra rutan "Dra MIDI till DAW" till ett MIDI-spår för att få mönstret som klipp – sekvensern stängs då av.
-- Egna förinställningar (presets): knappen Spara (Save). Filerna hamnar i Dokument/Falk Instruments/Bakelit/Presets.
+- Egna förinställningar (presets): knappen Spara (Save). Filerna hamnar i Dokument/falk elektro/Bakelit/Presets.

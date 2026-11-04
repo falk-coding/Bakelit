@@ -1,6 +1,6 @@
 # Bakelit – manual
 
-**Falk Instruments · version 1.8**
+**falk elektro · version 1.9**
 
 Bakelit är en polyfon analog-inspirerad synt med tre oscillatorer, undertoner, två filtertyper, stegsekvenserare, arpeggiator och polyrytm. Den här manualen tar dig från installation till eget ljud på tio minuter.
 
@@ -12,7 +12,7 @@ Bakelit är en polyfon analog-inspirerad synt med tre oscillatorer, undertoner, 
 
 1. Packa upp `Bakelit-mac.zip`.
 2. Högerklicka på **Installera.command** → **Öppna** (första gången, eftersom programmet inte är notariserat än).
-3. Starta om din DAW. Bakelit finns under *Falk Instruments*.
+3. Starta om din DAW. Bakelit finns under *falk elektro*.
 
 **Windows (VST3)**
 
@@ -20,7 +20,7 @@ Bakelit är en polyfon analog-inspirerad synt med tre oscillatorer, undertoner, 
 2. Dubbelklicka på **Installera.bat** och godkänn administratörsfrågan.
 3. Starta om din DAW.
 
-**Reason:** Bakelit finns i webbläsaren under *Instruments → Plugins → Falk Instruments*. Fungerar även i Ableton, Logic (AU), Cubase, FL Studio, Bitwig, Studio One och Reaper.
+**Reason:** Bakelit finns i webbläsaren under *Instruments → Plugins → falk elektro*. Fungerar även i Ableton, Logic (AU), Cubase, FL Studio, Bitwig, Studio One och Reaper.
 
 ---
 
@@ -75,7 +75,7 @@ Volym för **OSC 1–3**, **Sub Oct** (en klassisk fyrkant en oktav under OSC 1)
 | Ratt | Gör |
 |---|---|
 | Type | **Ladder** (rund, fet, 24 dB) · **Steppe LP** (aggressiv, rå) · **Steppe BP** (bandpass, nasal) |
-| Cutoff | Brytfrekvens – mörkt/ljust |
+| Cutoff | Brytfrekvens – mörkt/ljust (kopparratten – samma på alla falk elektro-instrument) |
 | Reso | Resonans – tjut vid brytfrekvensen; självsvänger högst upp |
 | Drive | Överstyrning in i filtret |
 | Env | Hur mycket Filterkurvan öppnar filtret |
@@ -159,7 +159,7 @@ Fyra spår, var och en med:
 - **Spara (Save)** sparar alla rattar och mönster. Samma namn = skriv över (frågar först).
 - **Ta bort (Delete)** tar bort valt eget ljud.
 - Egna ljud ligger överst i listan under **Egna (User)**.
-- Filerna (`.bakelit`) finns i **Dokument/Falk Instruments/Bakelit/Presets** – kopiera mappen för säkerhetskopia eller för att flytta mellan Mac och Windows.
+- Filerna (`.bakelit`) finns i **Dokument/falk elektro/Bakelit/Presets** – kopiera mappen för säkerhetskopia eller för att flytta mellan Mac och Windows.
 - DAW-projektet minns allt, även mönster och utfällda paneler.
 
 ---
@@ -176,4 +176,4 @@ Fyra spår, var och en med:
 
 ---
 
-*Bakelit © Falk Instruments. VST är ett varumärke som tillhör Steinberg Media Technologies GmbH.*
+*Bakelit © falk elektro. VST är ett varumärke som tillhör Steinberg Media Technologies GmbH.*

@@ -1,6 +1,6 @@
-# Bakelit – Falk Instruments
+# Bakelit – falk elektro
 
-*Internt kodnamn: StesoLead (repo, klassnamn). Synligt produktnamn: **Bakelit**, tillverkare **Falk Instruments**
+*Internt kodnamn: StesoLead (repo, klassnamn). Synligt produktnamn: **Bakelit**, tillverkare **falk elektro**
 (ett varumärke för ijoli). Tillverkar-/pluginkoden Falk/Stsl får aldrig ändras – då hittar DAW:arna inte gamla projekt.*
 
 Polyfon analog-inspirerad synth som VST3/AU-plugin (macOS och Windows) byggd med [JUCE](https://juce.com).
