@@ -362,9 +362,17 @@ std::vector<SeqNote> readMidiFile (const juce::File& f, double offsetPpq)
         return out;
     const double tpq = mf.getTimeFormat();
     for (int t = 0; t < mf.getNumTracks(); ++t)
+    {
+        // Sektioner-spåret (låtformens karta) är inte synthens toner.
+        bool isSections = false;
+        for (const auto* e : *mf.getTrack (t))
+            isSections = isSections || (e->message.isTrackNameEvent() && e->message.getTextFromTextMetaEvent() == "Sektioner");
+        if (isSections)
+            continue;
         for (const auto* e : *mf.getTrack (t))
             if (e->message.isNoteOn())
                 out.push_back ({ offsetPpq + e->message.getTimeStamp() / tpq, e->message.getNoteNumber() });
+    }
     return out;
 }
 
@@ -814,6 +822,28 @@ void testArrangement()
                         markers.add (e->message.getTextFromTextMetaEvent());
     }
     check (markers.contains ("Break") && markers.contains ("Drop") && markers.contains ("Outro"), "markörerna saknas");
+    // Sektioner-spåret: break = F3 (53) på takt 65, drop = A3 (57) på takt 97.
+    bool breakNote = false, dropNote = false;
+    {
+        juce::FileInputStream in (file);
+        juce::MidiFile mf;
+        if (in.openedOk() && mf.readFrom (in))
+            for (int t = 0; t < mf.getNumTracks(); ++t)
+            {
+                juce::String name;
+                for (const auto* e : *mf.getTrack (t))
+                {
+                    if (e->message.isTrackNameEvent()) name = e->message.getTextFromTextMetaEvent();
+                    if (name == "Sektioner" && e->message.isNoteOn())
+                    {
+                        const double x = e->message.getTimeStamp() / mf.getTimeFormat();
+                        breakNote = breakNote || (std::abs (x - 256.0) < 1e-6 && e->message.getNoteNumber() == 53);
+                        dropNote = dropNote || (std::abs (x - 384.0) < 1e-6 && e->message.getNoteNumber() == 57);
+                    }
+                }
+            }
+    }
+    check (breakNote && dropNote, "Sektioner-spåret saknas eller har fel toner");
 
     // Live = export: 104 takter med DAW:ns markörer över hela låten.
     TestPlayHead ph;

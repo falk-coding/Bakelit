@@ -139,7 +139,7 @@ Rutan **LÅT (Song)** uppe till höger i sekvenseraren gör långa MIDI-dragning
 | Evolve | Tätheten andas från fras till fras, styrkan **byggs upp genom frasen** (filtret öppnas via Velocity) och enstaka toner lyfter en oktav mot slutet |
 | Fills | Chans till fill i frasens sista taktslag: rullningar som stiger |
 | Phrase | Frasens längd: 4/8/16/32 takter |
-| Form | **Låtform** för hela dragningen: *Classic*, *Long break*, *Hypnotic*, *Short* (Off = av). Intro → uppbyggnad → huvuddel → **break 32 takter** (glest och lågt, spänningen byggs i slutet med rullningar och en kort paus) → **drop** → … → outro. Markörer (Intro, Break, Drop …) följer med i MIDI-filen. Slagg följer exakt samma form – samma markörer ger breaks och drops på samma takter |
+| Form | **Låtform** för hela dragningen: *Classic*, *Long break*, *Hypnotic*, *Short* (Off = av). Intro → uppbyggnad → huvuddel → **break 32 takter** (glest och lågt, spänningen byggs i slutet med rullningar och en kort paus) → **drop** → … → outro. Markörer (Intro, Break, Drop …) följer med i MIDI-filen, plus ett spår **Sektioner** med en ton i början av varje del (C intro, D uppbyggnad, E huvuddel, F break, G buildup, A drop, H outro) – syns som karta även i Reason. Slagg följer exakt samma form – samma markörer ger breaks och drops på samma takter |
 
 **Kom igång:** välj ett ljud i kategorin **Song**, lägg markörerna över hela låten (t.ex. 5 minuter) och dra MIDI till DAW:n. Sedan är det bara att muta där du vill ha brejk. Samma takt blir alltid likadan, så det du drar är exakt det du hörde.
 

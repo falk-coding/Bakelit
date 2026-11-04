@@ -141,7 +141,7 @@ The **LÅT (Song)** box at the top right of the sequencer makes long MIDI drags 
 | Evolve | Density breathes from phrase to phrase, velocity **builds through each phrase** (opening the filter via Velocity) and the odd note lifts an octave towards the end |
 | Fills | Chance of a fill in the last beat of a phrase: rising rolls |
 | Phrase | Phrase length: 4/8/16/32 bars |
-| Form | **Song form** for the whole drag: *Classic*, *Long break*, *Hypnotic*, *Short* (Off = none). Intro → build → main → **32-bar break** (sparse and low, tension builds at the end with rolls and a short gap) → **drop** → … → outro. Markers (Intro, Break, Drop …) are included in the MIDI file. Slagg follows exactly the same form – same locators give breaks and drops on the same bars |
+| Form | **Song form** for the whole drag: *Classic*, *Long break*, *Hypnotic*, *Short* (Off = none). Intro → build → main → **32-bar break** (sparse and low, tension builds at the end with rolls and a short gap) → **drop** → … → outro. Markers (Intro, Break, Drop …) are included in the MIDI file, plus a **Sektioner** (sections) track with one note at the start of each part (C intro, D build, E main, F break, G buildup, A drop, B outro) – a map that shows up even in Reason. Slagg follows exactly the same form – same locators give breaks and drops on the same bars |
 
 **Get started:** pick a sound in the **Song** category, set the locators across the whole track (e.g. 5 minutes) and drag the MIDI to your DAW. Then just mute where you want breaks. The same bar always comes out the same, so what you drag is exactly what you heard.
 

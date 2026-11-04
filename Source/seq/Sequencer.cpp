@@ -730,6 +730,32 @@ juce::MidiFile renderMidiFile (const Pattern& pattern, const Settings& settings,
     juce::MidiFile file;
     file.setTicksPerQuarterNote (ticksPerQuarter);
     file.addTrack (track);
+
+    // Med låtform: ett andra spår "Sektioner" – en ton i början av varje del (karta över låten, syns även i Reason).
+    if (settings.arrForm > falk::arr::off)
+    {
+        juce::MidiMessageSequence sections;
+        auto name = juce::MidiMessage::textMetaEvent (3, "Sektioner");
+        name.setTimeStamp (0);
+        sections.addEvent (name);
+        for (const auto& [ppq, part] : falk::arr::markers (settings.arrForm, settings.arrStart, settings.arrEnd, settings.barPpq))
+        {
+            if (ppq < fromPpq || ppq >= toPpq)
+                continue;
+            const int note = falk::arr::sectionNote (part);
+            auto on = juce::MidiMessage::noteOn (2, note, 0.8f);
+            on.setTimeStamp (std::round ((ppq - fromPpq) * ticksPerQuarter));
+            auto off = juce::MidiMessage::noteOff (2, note);
+            off.setTimeStamp (std::round ((std::min (ppq + 1.0, toPpq) - fromPpq) * ticksPerQuarter));
+            sections.addEvent (on);
+            sections.addEvent (off);
+        }
+        auto endS = juce::MidiMessage::endOfTrack();
+        endS.setTimeStamp (std::round ((toPpq - fromPpq) * ticksPerQuarter));
+        sections.addEvent (endS);
+        sections.updateMatchedPairs();
+        file.addTrack (sections);
+    }
     return file;
 }
 } // namespace steso::seq
