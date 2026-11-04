@@ -91,6 +91,10 @@ namespace pid
     inline constexpr const char* osc3SubDiv  = "osc3SubDiv";
     inline constexpr const char* mixSubh3    = "mixSubh3";
     inline constexpr const char* osc3PW      = "osc3PW";     // v1.8: 50 % = som förut
+    // v1.9 Låt (song): 0 = av -> äldre projekt låter som förut.
+    inline constexpr const char* songEvolve  = "songEvolve";
+    inline constexpr const char* songFills   = "songFills";
+    inline constexpr const char* songPhrase  = "songPhrase";
 
     inline constexpr const char* polyOn      = "polyOn";
     inline constexpr const char* polyBars    = "polyBars";
@@ -108,6 +112,9 @@ namespace pid
     inline const char* polyLanePitch (int lane)  { return polyPitchIds[lane & 3]; }
     inline const char* polyLaneSteps (int lane)  { return polyStepsIds[lane & 3]; }
 } // namespace pid
+
+inline const juce::StringArray songPhraseNames { "4 bars", "8 bars", "16 bars", "32 bars" };
+inline int songPhraseBars (int index) { static constexpr int b[] { 4, 8, 16, 32 }; return b[juce::jlimit (0, 3, index)]; }
 
 inline const juce::StringArray waveNames { "Saw", "Square", "Triangle", "Sine" };
 inline const juce::StringArray lfoWaveNames { "Sine", "Triangle", "Saw", "Square", "S&H" };
@@ -145,6 +152,7 @@ struct ParamPointers
     std::atomic<float>* osc1SubDiv {}; std::atomic<float>* osc2SubDiv {};
     std::atomic<float>* mixSubh1 {}; std::atomic<float>* mixSubh2 {};
     std::atomic<float>* osc3SubDiv {}; std::atomic<float>* mixSubh3 {}; std::atomic<float>* osc3PW {};
+    std::atomic<float>* songEvolve {}; std::atomic<float>* songFills {}; std::atomic<float>* songPhrase {};
     struct PolyLane
     {
         std::atomic<float>* on {}; std::atomic<float>* type {}; std::atomic<float>* pulses {};

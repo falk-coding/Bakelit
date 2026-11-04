@@ -20,7 +20,7 @@ public:
     static constexpr int earW = 36;                         // rackfäste per sida
     static constexpr int innerW = 1120;                     // panelens bredd mellan fästena
     static constexpr int baseWidth = innerW + 2 * earW;
-    static constexpr int synthH = 542, seqH = 272, keysH = 74, unitGap = 6;
+    static constexpr int synthH = 542, seqH = 336, keysH = 74, unitGap = 6;
     static constexpr int baseHeight = synthH + unitGap + seqH + unitGap + keysH;   // allt utfällt
 
     // Fäll ut/in sekvenser och klaviatur (sparas i projektet).

@@ -133,6 +133,17 @@ Fold out with **Sekv. (Seq)**. Follows your DAW's tempo; without transport it ru
 
 ---
 
+### Song (LÅT) – a whole track at once
+The **LÅT (Song)** box at the top right of the sequencer makes long MIDI drags come alive, in Seq, Arp and Polyrhythm:
+
+| Control | Does |
+|---|---|
+| Evolve | Density breathes from phrase to phrase, velocity **builds through each phrase** (opening the filter via Velocity) and the odd note lifts an octave towards the end |
+| Fills | Chance of a fill in the last beat of a phrase: rising rolls |
+| Phrase | Phrase length: 4/8/16/32 bars |
+
+**Get started:** pick a sound in the **Song** category, set the locators across the whole track (e.g. 5 minutes) and drag the MIDI to your DAW. Then just mute where you want breaks. The same bar always comes out the same, so what you drag is exactly what you heard.
+
 ## 6. Polyrhythm (POLYRYTM)
 
 Turn on **Polyrhythm** in the sequencer row. It takes over from Arp/Seq and plays from the key you hold. The rings show where the hits fall – where lanes meet you get an **accent**.

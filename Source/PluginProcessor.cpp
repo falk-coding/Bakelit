@@ -77,6 +77,9 @@ steso::seq::Settings StesoLeadProcessor::currentSeqSettings() const
     s.gateLength = (int) params.seqGateLen->load();
 
     s.barPpq = hostTsNum.load() * 4.0 / juce::jmax (1, hostTsDen.load());
+    s.evolve = params.songEvolve->load();
+    s.fills = params.songFills->load();
+    s.phraseBars = steso::songPhraseBars ((int) params.songPhrase->load());
     s.polyBars = (int) params.polyBars->load();
     for (size_t l = 0; l < (size_t) polyLanes; ++l)
     {

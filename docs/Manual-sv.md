@@ -131,6 +131,17 @@ Fäll ut med **Sekv. (Seq)**. Följer DAW:ns tempo; utan transport kör den på 
 
 ---
 
+### Låt (Song) – en hel låt på en gång
+Rutan **LÅT (Song)** uppe till höger i sekvenseraren gör långa MIDI-dragningar levande, i Seq, Arp och Polyrytm:
+
+| Kontroll | Gör |
+|---|---|
+| Evolve | Tätheten andas från fras till fras, styrkan **byggs upp genom frasen** (filtret öppnas via Velocity) och enstaka toner lyfter en oktav mot slutet |
+| Fills | Chans till fill i frasens sista taktslag: rullningar som stiger |
+| Phrase | Frasens längd: 4/8/16/32 takter |
+
+**Kom igång:** välj ett ljud i kategorin **Song**, lägg markörerna över hela låten (t.ex. 5 minuter) och dra MIDI till DAW:n. Sedan är det bara att muta där du vill ha brejk. Samma takt blir alltid likadan, så det du drar är exakt det du hörde.
+
 ## 6. Polyrytm
 
 Slå på **Polyrhythm** i sekvenserarens rad. Den går före Arp/Seq och spelar från tangenten du håller. Ringarna visar var slagen ligger – där spåren möts blir det **accent**.

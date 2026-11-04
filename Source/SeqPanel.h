@@ -87,6 +87,10 @@ private:
     juce::Label fromLabel, toLabel, rangeInfo, bypassLabel;
     juce::TextButton reenableButton { juce::String::fromUTF8 ("Slå på (Re-enable)") };
 
+    // Låt (song): Evolve, Fills, Phrase – gör långa exporter levande.
+    std::vector<std::unique_ptr<Control>> songControls;
+    juce::Rectangle<int> songArea;
+
     juce::Slider euclidHits { juce::Slider::IncDecButtons, juce::Slider::TextBoxLeft };
     juce::Slider euclidRotate { juce::Slider::IncDecButtons, juce::Slider::TextBoxLeft };
     juce::Label hitsLabel, rotateLabel;

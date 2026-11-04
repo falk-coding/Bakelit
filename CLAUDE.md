@@ -48,7 +48,7 @@ Commits: författare `Hans Falk <hans.falk@gmail.com>`. Pusha direkt till main (
 | Del | Fil |
 |---|---|
 | Parametrar | `Source/Parameters.*` |
-| Fabrikspresets 1–35, Polyrytm 136–145, Subharmonic 146–149 | `Source/Presets.cpp` |
+| Fabrikspresets 1–35, Polyrytm 136–145, Subharmonic 146–149, Song 150–153 | `Source/Presets.cpp` |
 | Presets 36–135 | `tools/gen_presets.py` → `Source/PresetBank.inc` (nivåer i `tools/levels.json`) |
 | Oscillator, envelope, Ladder-/Steppe-filter (`PolivoksFilter`), halvbandsdecimator | `Source/dsp/DspUtils.h` |
 | Röster (3 osc, unison, 2x oversampling, feedback, warmth), MIDI, LFO | `Source/dsp/SynthEngine.*` |
@@ -65,6 +65,12 @@ manual). Plugin-ID Falk/Stsl och BUNDLE_ID oförändrade. Egna förinställninga
 Dokument/Falk Instruments/Bakelit/Presets till Dokument/falk elektro/Bakelit/Presets. Huvudet: loggan "falk elektro"
 längst upp till vänster, sedan produktnamnet (`drawBrandHeader`); versionen bara i loggans tooltip och svagt nere till höger.
 Koppartopp på Cutoff (falk elektros signatur, samma i Slagg). Loggan är provisorisk tills Hans varumärkeskit finns.
+Låt (song mode), som i Slagg: `songEvolve`/`songFills`/`songPhrase` (0 = av). Lager ovanpå Seq/Arp/Poly i
+`seq::generate` (`applySong`): tätheten andas per fras, velocity byggs upp genom frasen (spänning via filtrets Velocity),
+oktavlyft mot frasslut, fills = stigande rullningar i frasens sista taktslag. Deterministiskt per position.
+4 presets "Song - …" (härledda från befintliga sekvensljud, sist i listan). Test: 5 min-export per Song-preset
+(olika takter, varierande täthet, styrkan stiger genom frasen, oktavlyft) + uppspelning = export.
+Fixat: Polyrytm-generatorn hade fast gräns på 256 slag per anrop, så långa MIDI-exporter kapades.
 
 ### v1.8.0
 Klart: motor, Fat-funktioner, sekvenser med MIDI-export/markörer, mörkt slitet skin (v1.7: kall nattsvart plåt, punktljus över allt, rost/ärg, korn, slitna stålrattar, präglad logga) med svenska texter,

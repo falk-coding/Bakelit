@@ -91,6 +91,11 @@ struct Settings
     int polyBars = 1;          // cykelns längd i takter (Bar-spår)
     double barPpq = 4.0;       // en takts längd i kvartsnoter (från taktarten)
 
+    // Låt (song, v1.9): gör långa exporter levande. Allt beror på positionen i låten -> export = uppspelning.
+    float evolve = 0.0f;       // 0..1: tätheten andas per fras, styrkan byggs upp genom frasen, oktavlyft mot slutet
+    float fills = 0.0f;        // 0..1: chans till fill (rullningar som stiger) i frasens sista taktslag
+    int phraseBars = 8;        // frasens längd i takter
+
     double polyCyclePpq() const noexcept { return std::max (1, polyBars) * std::max (0.25, barPpq); }
 };
 

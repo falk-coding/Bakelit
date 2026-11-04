@@ -317,8 +317,10 @@ namespace
                        double fromPpq, double toPpq, std::vector<NoteEvent>& out)
     {
         struct Hit { NoteEvent e; int lane; };
-        std::array<Hit, 256> hits;
-        int count = 0;
+        // Ingen fast gräns: en lång export (t.ex. en hel låt) kan ha tusentals slag. Återanvänd minnet mellan
+        // anropen så att ljudtråden inte allokerar efter första blocken.
+        static thread_local std::vector<Hit> hits;
+        hits.clear();
         const int root = chord.notes[(size_t) (chord.count - 1)];   // senast nedtryckta = grundton
 
         for (int lane = 0; lane < polyLanes; ++lane)
@@ -331,7 +333,7 @@ namespace
             const auto first = (int64_t) std::floor (fromPpq / interval) - 1;
             const auto last  = (int64_t) std::floor (toPpq / interval) + 1;
 
-            for (int64_t n = first; n <= last && count < (int) hits.size(); ++n)
+            for (int64_t n = first; n <= last; ++n)
             {
                 const double on = polyPulsePpq (s, lane, n);
                 if (on < fromPpq || on >= toPpq || ! polyPulseIsHit (s, lane, n))
@@ -346,11 +348,12 @@ namespace
                 e.ppqOff = on + std::max (0.02, 0.5 * (double) s.gateScale * interval);
                 e.note = std::clamp (root + l.pitch + pattern.lanePitch[(size_t) lane][stepIdx].load(), 0, 127);
                 e.velocity = 0.78f;
-                hits[(size_t) count++] = { e, lane };
+                hits.push_back ({ e, lane });
             }
         }
 
-        std::sort (hits.begin(), hits.begin() + count, [] (const Hit& a, const Hit& b)
+        const int count = (int) hits.size();
+        std::sort (hits.begin(), hits.end(), [] (const Hit& a, const Hit& b)
         {
             return a.e.ppqOn != b.e.ppqOn ? a.e.ppqOn < b.e.ppqOn : a.lane < b.lane;
         });
@@ -386,8 +389,8 @@ namespace
 }
 
 //==============================================================================
-void generate (const Pattern& pattern, const Settings& s, const Chord& chord,
-               double fromPpq, double toPpq, std::vector<NoteEvent>& out)
+static void generateBase (const Pattern& pattern, const Settings& s, const Chord& chord,
+                          double fromPpq, double toPpq, std::vector<NoteEvent>& out)
 {
     if (s.mode == Mode::off || chord.count <= 0 || s.stepPpq <= 0.0 || toPpq <= fromPpq)
         return;
@@ -501,6 +504,100 @@ void NoteStream::flushAll (double ppq, std::vector<Out>& out)
 }
 
 //==============================================================================
+//==============================================================================
+// Låt (song): ett lager ovanpå sekvensern/arpen/polyrytmen. Deterministiskt per tonens position i låten,
+// så det blir likadant i realtid (block för block) som i en export – men olika i varje takt och fras.
+namespace
+{
+    double smoothstep (double x) noexcept { return x * x * (3.0 - 2.0 * x); }
+
+    // Tätheten 0..1 i en takt: mjuk slumpkurva som byter mål varje fras.
+    double songDensity (int64_t bar, int phrase) noexcept
+    {
+        const int64_t seg = bar >= 0 ? bar / phrase : (bar - phrase + 1) / phrase;
+        const double u = (double) (bar - seg * phrase) / (double) phrase;
+        const double a = hash01 (seg, 0x534F4E47444E53ull);
+        const double b = hash01 (seg + 1, 0x534F4E47444E53ull);
+        return a + (b - a) * smoothstep (u);
+    }
+
+    void applySong (const Settings& s, std::vector<NoteEvent>& events)
+    {
+        const int phrase = std::max (1, s.phraseBars);
+        const double barPpq = std::max (0.25, s.barPpq);
+        std::vector<NoteEvent> result;
+        result.reserve (events.size() * 2);
+
+        for (const auto& src : events)
+        {
+            auto e = src;
+            const auto tick = (int64_t) std::llround (e.ppqOn * 960.0);
+            const auto bar = (int64_t) std::floor (e.ppqOn / barPpq + 1.0e-9);
+            const double inBar = (e.ppqOn - (double) bar * barPpq) / barPpq;          // 0..1 i takten
+            const int64_t inPhrase = ((bar % phrase) + phrase) % phrase;
+            const double progress = ((double) inPhrase + inBar) / (double) phrase;    // 0..1 i frasen
+            const bool phraseDownbeat = inPhrase == 0 && inBar < 1.0e-6;
+
+            if (s.evolve > 0.0f)
+            {
+                // Tätheten andas: vissa fraser glesare, andra fulla. Frasens första slag och bundna toner sparas.
+                const double keep = 1.0 - 0.7 * s.evolve * (1.0 - songDensity (bar, phrase));
+                if (! phraseDownbeat && ! e.tied && hash01 (tick, 0x44524F50ull) >= keep)
+                    continue;
+
+                // Spänning: styrkan byggs upp genom frasen och faller tillbaka vid nästa (öppnar filtret via Velocity).
+                const double arc = (1.0 - 0.3 * s.evolve) + 0.55 * s.evolve * std::pow (progress, 1.3);
+                e.velocity = (float) std::clamp ((double) e.velocity * arc, 0.08, 1.0);
+
+                // Lyft mot slutet av frasen: enstaka toner en oktav upp.
+                if (progress >= 0.75 && e.note + 12 <= 127 && hash01 (tick, 0x4F4354ull) < 0.3 * s.evolve)
+                    e.note += 12;
+            }
+
+            // Fill: i frasens sista taktslag blir tonerna rullningar som stiger.
+            const bool fillBar = s.fills > 0.0f && inPhrase == phrase - 1 && hash01 (bar, 0x46494C4Cull) < (double) s.fills;
+            if (fillBar && inBar >= 0.75 - 1.0e-9)
+            {
+                const int r = 2 + (int) (hash01 (tick, 0x524F4C4Cull) * 2.0);           // 2–3 slag
+                const double span = std::clamp (e.ppqOff - e.ppqOn, s.stepPpq * 0.5, s.stepPpq * 2.0);
+                for (int k = 0; k < r; ++k)
+                {
+                    auto f = e;
+                    f.tied = false;
+                    f.ppqOn = e.ppqOn + (double) k * span / r;
+                    f.ppqOff = f.ppqOn + span / r * 0.8;
+                    f.velocity = (float) std::clamp ((double) e.velocity * (0.7 + 0.3 * (k + 1) / r) + 0.1 * inBar, 0.08, 1.0);
+                    if (k == r - 1 && f.note + 12 <= 127 && hash01 (tick + k, 0x5550ull) < 0.5)
+                        f.note += 12;
+                    result.push_back (f);
+                }
+                continue;
+            }
+            result.push_back (e);
+        }
+        events.swap (result);
+    }
+}
+
+void generate (const Pattern& pattern, const Settings& s, const Chord& chord,
+               double fromPpq, double toPpq, std::vector<NoteEvent>& out)
+{
+    if (s.evolve <= 0.0f && s.fills <= 0.0f)
+    {
+        generateBase (pattern, s, chord, fromPpq, toPpq, out);
+        return;
+    }
+
+    // Generera lite före fönstret: en fill kan dela en ton som började i förra blocket.
+    std::vector<NoteEvent> tmp;
+    generateBase (pattern, s, chord, fromPpq - 2.0 * std::max (0.125, s.stepPpq), toPpq, tmp);
+    applySong (s, tmp);
+    std::stable_sort (tmp.begin(), tmp.end(), [] (const NoteEvent& a, const NoteEvent& b) { return a.ppqOn < b.ppqOn; });
+    for (const auto& e : tmp)
+        if (e.ppqOn >= fromPpq && e.ppqOn < toPpq)
+            out.push_back (e);
+}
+
 juce::MidiFile renderMidiFile (const Pattern& pattern, const Settings& settings, const Chord& chord,
                                double fromPpq, double toPpq, double bpm, int timeSigNum, int timeSigDen)
 {

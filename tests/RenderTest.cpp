@@ -579,7 +579,9 @@ void testPolyrhythm()
     int polyPresets = 0;
     for (int i = 0; i < proc->getNumPrograms(); ++i)
     {
-        // Alla presets som använder Polyrytm (kategorierna Polyrhythm och Subharmonic).
+        // Alla presets som använder Polyrytm (kategorierna Polyrhythm och Subharmonic; Song testas för sig).
+        if (proc->getProgramName (i).startsWith ("Song"))
+            continue;
         proc->setCurrentProgram (i);
         if (getParam (steso::pid::polyOn) < 0.5f)
             continue;
@@ -698,6 +700,78 @@ void testSubharmonics()
     check (std::abs (f3 - 220.0) <= 2.0, "undertonen på OSC 3 ÷2 ger " + juce::String (f3) + " Hz (väntat 220)");
     check (std::abs (f1 - 110.0) <= 2.0, "undertonen på OSC 1 ÷4 ger " + juce::String (f1) + " Hz (väntat 110)");
     check (std::abs (f2 - 146.67) <= 2.0, "undertonen på OSC 2 ÷3 ger " + juce::String (f2) + " Hz (väntat 147)");
+}
+
+void testSongMode()
+{
+    std::cout << "Låt (song mode):" << std::endl;
+    std::unique_ptr<StesoLeadProcessor> proc (dynamic_cast<StesoLeadProcessor*> (createPluginFilter()));
+    TestPlayHead ph;
+    int songs = 0;
+    for (int i = 0; i < proc->getNumPrograms(); ++i)
+    {
+        if (! proc->getProgramName (i).startsWith ("Song"))
+            continue;
+        ++songs;
+        proc->setCurrentProgram (i);
+        const auto name = proc->getProgramName (i);
+        if (auto* p = proc->apvts.getParameter (steso::pid::seqMidiOut)) p->setValueNotifyingHost (1.0f);
+
+        // 1. Uppspelning = export, block för block (fills delar toner över blockgränser).
+        int ons = 0, offs = 0;
+        const auto live = runTransport (*proc, ph, 8.0, { 48 }, ons, offs);
+        check (ons == offs && proc->getActiveVoiceCount() == 0, name + ": hängande toner");
+        juce::String why;
+        const auto file8 = proc->writeMidiExport (0.0, 32.0, "test-song8.mid");
+        const bool same = sameNotes (live, readMidiFile (file8, 0.0), why);
+        check (same, name + ": export skiljer sig från uppspelningen: " + why);
+
+        // 2. Fem minuter i 120 BPM = 150 takter: ska variera och bygga spänning.
+        const double end = 600.0;
+        const auto file = proc->writeMidiExport (0.0, end, "test-song.mid");
+        juce::FileInputStream in (file);
+        juce::MidiFile mf;
+        if (! (in.openedOk() && mf.readFrom (in)))
+        {
+            check (false, name + ": exporten kan inte läsas");
+            continue;
+        }
+        const double tpq = mf.getTimeFormat();
+        const int bars = (int) (end / 4.0);
+        std::vector<juce::String> shape ((size_t) bars);
+        std::vector<int> count ((size_t) bars, 0);
+        double velStart = 0, velEnd = 0;
+        int nStart = 0, nEnd = 0, octaveUps = 0, lastNote = -1;
+        const int phrase = steso::songPhraseBars ((int) proc->apvts.getRawParameterValue (steso::pid::songPhrase)->load());
+        for (int t = 0; t < mf.getNumTracks(); ++t)
+            for (const auto* e : *mf.getTrack (t))
+                if (e->message.isNoteOn())
+                {
+                    const double ppq = e->message.getTimeStamp() / tpq;
+                    const int bar = (int) (ppq / 4.0);
+                    if (bar >= bars) continue;
+                    shape[(size_t) bar] << juce::roundToInt ((ppq - bar * 4.0) * 8.0) << ":" << e->message.getNoteNumber() << ",";
+                    ++count[(size_t) bar];
+                    const int inPhrase = bar % phrase;
+                    if (inPhrase == 0) { velStart += e->message.getVelocity(); ++nStart; }
+                    if (inPhrase == phrase - 1) { velEnd += e->message.getVelocity(); ++nEnd; }
+                    if (lastNote >= 0 && e->message.getNoteNumber() - lastNote >= 12) ++octaveUps;
+                    lastNote = e->message.getNoteNumber();
+                }
+        std::set<juce::String> distinct (shape.begin(), shape.end());
+        const int minC = *std::min_element (count.begin(), count.end());
+        const int maxC = *std::max_element (count.begin(), count.end());
+        velStart /= std::max (1, nStart);
+        velEnd /= std::max (1, nEnd);
+        std::cout << "  " << name.paddedRight (' ', 24) << (int) distinct.size() << " olika takter av " << bars
+                  << ", " << minC << "–" << maxC << " toner/takt, styrka fras-start " << juce::roundToInt (velStart)
+                  << " -> fras-slut " << juce::roundToInt (velEnd) << std::endl;
+        check ((int) distinct.size() >= bars / 3, name + ": för platt – bara " + juce::String ((int) distinct.size()) + " olika takter");
+        check (maxC - minC >= 3, name + ": tätheten varierar för lite");
+        check (velEnd > velStart + 8.0, name + ": ingen spänning – styrkan byggs inte upp genom frasen");
+        check (octaveUps > 0, name + ": inga oktavlyft");
+    }
+    check (songs == 4, "väntade 4 Song-presets, hittade " + juce::String (songs));
 }
 
 void testStress()
@@ -858,6 +932,7 @@ int main (int argc, char** argv)
     testSequencer();
     testPolyrhythm();
     testSubharmonics();
+    testSongMode();
     testStress();
     testUserPresets();
     if (shot != juce::File())

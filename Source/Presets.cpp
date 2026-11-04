@@ -45,7 +45,9 @@ const std::vector<Preset>& getFactoryPresets()
 {
     using namespace pid;
 
-    static const std::vector<Preset> presets {
+    static const std::vector<Preset> presets = []
+    {
+    std::vector<Preset> list {
         { "Init Poly", "Basic", {} },
 
         { "Steso Lead", "Lead", {
@@ -360,6 +362,33 @@ const std::vector<Preset>& getFactoryPresets()
             { master, -4.6f } },
             { { ON, DIV, 2, 16, 0, 5 }, { ON, DIV, 3, 16, 12, 2 } }), {}, "0 3 7 -2 5 | 0 -5" },
     };
+
+    // v1.9: Song-presets (läggs sist – programnumren sparas i projekt). Bygger på befintliga sekvensljud och
+    // lägger på Låt-läget, så att en hel låt kan dras in mellan markörerna utan att bli platt.
+    auto derive = [&list] (const char* base, const char* name, float evolve, float fills, float phraseIndex)
+    {
+        for (const auto& p : list)
+        {
+            if (p.name == base)
+            {
+                auto copy = p;
+                copy.name = name;
+                copy.category = "Song";
+                copy.values.push_back ({ pid::songEvolve, evolve });
+                copy.values.push_back ({ pid::songFills, fills });
+                copy.values.push_back ({ pid::songPhrase, phraseIndex });
+                list.push_back (copy);
+                return;
+            }
+        }
+        jassertfalse;
+    };
+    derive ("Odd Seven Acid",     "Song - Acid Night",      0.7f, 0.5f, 1);
+    derive ("Five Over Four Arp", "Song - Rising Arp",      0.6f, 0.4f, 1);
+    derive ("Clockwork Acid",     "Song - Clockwork Drive", 0.65f, 0.55f, 2);
+    derive ("Gearbox Sequence",   "Song - Undertone Rail",  0.75f, 0.45f, 1);
+    return list;
+    }();
 
     return presets;
 }
